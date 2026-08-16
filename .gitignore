@@ -1,14 +1,31 @@
-data_raw/
-Dataset/
-data/
-preprocessed/
-embeddings/
-checkpoints/
-logs/
-demos/
-CelebDF/
-DFDC/
-FaceForensics/
+# Repo-root-only dataset/output/env directories. Anchored with a leading
+# slash so each pattern matches ONLY that exact top-level path — NOT any
+# directory of the same name at any depth. Without the leading slash, git
+# treats e.g. "data/" as matching "data/" *or* "src/data/" *or*
+# "anything/data/" anywhere in the tree. That exact bug silently excluded
+# the real src/data/ source package (build_splits.py, preprocess_raw.py,
+# etc.) from every commit — see HANDOFF.md / the 2026-08 restructure notes.
+/data_raw/
+/Dataset/
+/data/
+/preprocessed/
+/embeddings/
+/checkpoints/
+/logs/
+/demos/
+/CelebDF/
+/DFDC/
+/FaceForensics/
+/venv/
+/env/
+/.deepfake/
+/conda_env/
+/ensemble_features/
+/.vscode/
+
+# Tool-generated cache directories: intentionally NOT anchored — these are
+# meant to be excluded wherever they appear (a venv, a subpackage, etc.),
+# unlike the project-specific directories above.
 .ipynb_checkpoints/
 *.ipynb_checkpoints
 __pycache__/
@@ -16,10 +33,6 @@ __pycache__/
 *.pyo
 *.pyd
 *.so
-venv/
-env/
-.deepfake/
-conda_env/
 *.env
 .DS_Store
 Thumbs.db
@@ -30,15 +43,15 @@ Thumbs.db
 *.log
 *.tmp
 *.cache
-.vscode/
 debug_*.json
-ensemble_features/
-KNOWLEDGE_BASE.md
+/KNOWLEDGE_BASE.md
 
 # Generated results (see results/README.md for the expected schema) —
-# tracked README stays, generated metrics.json does not.
-results/metrics.json
-results/leakage_report.json
+# tracked README stays, generated metrics.json does not. Anchored for the
+# same reason as the block above — no nested "results/" dir exists in this
+# repo today, but there's no reason to leave the same latent risk in place.
+/results/metrics.json
+/results/leakage_report.json
 
 # Python packaging / virtual envs
 .venv/
