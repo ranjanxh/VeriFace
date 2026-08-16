@@ -54,10 +54,12 @@ class LeakageReport:
     opaque_groups: int
     leaking_groups: list[LeakageFinding] = field(default_factory=list)
     note: str = (
-        "DFDC-derived stems are treated as opaque single-stem identities "
-        "(no source/identity mapping was preserved for DFDC in this "
-        "project — see src/data/identity.py docstring). A clean result "
-        "here does NOT rule out DFDC-side identity leakage, only FF++-side."
+        "DFDC-side leakage is checked via preserved metadata.json "
+        "(fake->original real-video mapping), when available — see "
+        "src/data/identity.py. Coverage is per-fake-video source pairing "
+        "only; two REAL videos of the same person with no fake derived "
+        "from either are still treated as separate identities, since DFDC "
+        "metadata does not expose an actor/person ID beyond that."
     )
 
     @property
