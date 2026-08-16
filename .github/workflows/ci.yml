@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install CPU-only dependencies
+        run: |
+          python -m pip install --upgrade pip
+          # CPU-only torch/torchvision: CI has no GPU, and the full CUDA
+          # wheels are large and unnecessary for lint + unit tests (see
+          # Dockerfile for the CUDA install path used on real hardware).
+          pip install torch==2.13.0 torchvision==0.28.0 --index-url https://download.pytorch.org/whl/cpu
+          pip install -r requirements-dev.txt
+
+      - name: Ruff lint
+        run: ruff check .
+
+      - name: pytest
+        run: pytest -v

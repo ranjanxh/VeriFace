@@ -1,0 +1,27 @@
+[project]
+name = "veriface"
+version = "0.2.0"
+description = "Dual-stream (spatial + temporal) deepfake video detection pipeline"
+requires-python = ">=3.12"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+exclude = ["archive"]
+
+[tool.ruff.lint]
+# BLE (blind-except) is deliberately included: a bare `except: pass` around
+# checkpoint loading is the exact bug class this restructure fixed (see
+# HANDOFF.md). Every remaining broad `except Exception` in the codebase has
+# an explicit `# noqa: BLE001` plus a comment explaining why it's intentional.
+select = ["E", "F", "I", "UP", "B", "BLE"]
+ignore = [
+    "E501",  # line length is enforced softly via line-length above, not hard-failed
+]
+
+[tool.ruff.lint.per-file-ignores]
+"app/main.py" = ["E402"]  # sys.path shim must run before the src.* imports below it

@@ -1,0 +1,36 @@
+# Pinned against the versions actually available on PyPI as of 2026-08-16
+# (verified via `pip index versions <pkg>` at restructure time — not guessed).
+# See HANDOFF.md "Environment Requirements" for GPU/CUDA install instructions;
+# torch/torchvision need the CUDA wheel index, not plain PyPI, for GPU support.
+
+# --- Deep learning core ---
+# For a CUDA build (required for training/GPU inference), install with:
+#   pip install torch==2.13.0 torchvision==0.28.0 --index-url https://download.pytorch.org/whl/cu129
+# (cu129 = CUDA 12.9; verified to have cp312 linux/x86_64 wheels for both
+# packages at pin time. See Dockerfile, which does exactly this.) A plain
+# `pip install -r requirements.txt` (this file, unmodified) installs the
+# CPU-only build, which is fine for running the test suite but not for
+# training or GPU-speed inference.
+torch==2.13.0
+torchvision==0.28.0
+timm==1.0.28
+facenet-pytorch==2.6.0
+
+# --- Vision / data ---
+opencv-python-headless==5.0.0.93
+numpy==2.5.2
+Pillow
+
+# --- Classical ML ---
+scikit-learn==1.9.0
+joblib==1.5.3
+
+# --- App ---
+streamlit==1.61.1
+plotly==6.9.0
+fpdf2==2.8.8  # provides the `fpdf` import name; the original `fpdf` PyPI package is unmaintained
+
+# --- Data pipeline ---
+pandas==3.0.5  # only used for optional FF++ metadata.csv parsing
+pyyaml==6.0.3
+tqdm==4.70.0

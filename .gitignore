@@ -33,3 +33,15 @@ Thumbs.db
 .vscode/
 debug_*.json
 ensemble_features/
+KNOWLEDGE_BASE.md
+
+# Generated results (see results/README.md for the expected schema) —
+# tracked README stays, generated metrics.json does not.
+results/metrics.json
+results/leakage_report.json
+
+# Python packaging / virtual envs
+.venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/

@@ -1,0 +1,6 @@
+# Dev/test/lint tools, pinned against PyPI as of 2026-08-16. Not needed to
+# run the app or training scripts — only for `pytest` and `ruff` (see CI:
+# .github/workflows/ci.yml).
+-r requirements.txt
+pytest==9.1.1
+ruff==0.16.3
