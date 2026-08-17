@@ -115,7 +115,7 @@ def _transforms(train: bool) -> T.Compose:
     return T.Compose(ops)
 
 
-def run_epoch(model, loader, device, criterion, optimizer=None, scaler=None) -> tuple[float, float]:
+def run_epoch(model, loader, device, criterion, optimizer=None, scaler=None, grad_clip_norm: float = 1.0) -> tuple[float, float]:
     is_train = optimizer is not None
     model.train(is_train)
 
@@ -137,6 +137,9 @@ def run_epoch(model, loader, device, criterion, optimizer=None, scaler=None) -> 
 
             if is_train:
                 scaler.scale(loss).backward()
+                if grad_clip_norm:
+                    scaler.unscale_(optimizer)
+                    torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=grad_clip_norm)
                 scaler.step(optimizer)
                 scaler.update()
 
@@ -165,6 +168,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--num-workers", type=int, default=6)
     parser.add_argument("--seed", type=int, default=SEED_DEFAULT)
     parser.add_argument("--resume", action="store_true", help="Resume from checkpoint-dir/spatial_last.pth if present")
+    parser.add_argument("--grad-clip-norm", type=float, default=1.0, help="Max gradient norm for clipping; 0 disables")
     args = parser.parse_args(argv)
 
     if not args.frames_dir.exists() or not args.labels_json.exists():
@@ -209,7 +213,7 @@ def main(argv: list[str] | None = None) -> int:
         logger.info("Resumed from epoch %d, best_val_auc=%.4f", start_epoch, best_val_auc)
 
     for epoch in range(start_epoch, args.epochs):
-        train_loss, train_auc = run_epoch(model, train_loader, device, criterion, optimizer, scaler)
+        train_loss, train_auc = run_epoch(model, train_loader, device, criterion, optimizer, scaler, grad_clip_norm=args.grad_clip_norm)
         val_loss, val_auc = run_epoch(model, val_loader, device, criterion)
         scheduler.step(val_auc)
 
