@@ -197,7 +197,18 @@ def process_video(video_path: Path, out_dir: Path, mtcnn: MTCNN, n_frames: int) 
                 frames_missing_face += 1
                 continue
 
-            arr = face.permute(1, 2, 0).clamp(0, 255).byte().numpy().astype(np.uint8)
+            # MTCNN's output tensor range varies (commonly ~[-1, 1] or
+            # ~[0, 1], not [0, 255]) -- rescale from its actual observed
+            # min/max rather than assuming a fixed range, then cast to
+            # uint8. The previous version assumed [0, 255] directly and
+            # clamped, which silently produced all-black (all-zero)
+            # crops for any tensor already in a normalized range.
+            face_min, face_max = face.min(), face.max()
+            if (face_max - face_min) > 1e-6:
+                normalized = (face - face_min) / (face_max - face_min)
+            else:
+                normalized = torch.zeros_like(face)
+            arr = (normalized.permute(1, 2, 0) * 255).clamp(0, 255).byte().numpy().astype(np.uint8)
             pending_saves.append((i, arr))
     finally:
         cap.release()
