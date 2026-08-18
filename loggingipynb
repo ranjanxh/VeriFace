@@ -6,9 +6,7 @@
    "id": "fd1cb9c4-5399-4a14-8fa6-543135e66b8f",
    "metadata": {},
    "outputs": [],
-   "source": [
-    "import os\n",
-    "os.environ[\"KAGGLE_API_TOKEN\"] = \"KGAT_169be0b8e32b3c319e349d8c24204ce8\""
+   "source": 
    ]
   },
   {
