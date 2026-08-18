@@ -51,6 +51,7 @@ class LeakageReport:
     total_stems: int
     total_identity_groups: int
     ffpp_pair_groups: int
+    dfdc_pair_groups: int
     opaque_groups: int
     leaking_groups: list[LeakageFinding] = field(default_factory=list)
     note: str = (
@@ -94,11 +95,14 @@ def check_leakage(stem_to_split: dict[str, str]) -> LeakageReport:
 
     leaking: list[LeakageFinding] = []
     ffpp_pair_groups = 0
+    dfdc_pair_groups = 0
     opaque_groups = 0
 
     for group in groups.values():
         if group.confidence == "ffpp_pair":
             ffpp_pair_groups += 1
+        elif group.confidence == "dfdc_pair":
+            dfdc_pair_groups += 1
         else:
             opaque_groups += 1
 
@@ -123,6 +127,7 @@ def check_leakage(stem_to_split: dict[str, str]) -> LeakageReport:
         total_stems=len(stem_to_split),
         total_identity_groups=len(groups),
         ffpp_pair_groups=ffpp_pair_groups,
+        dfdc_pair_groups=dfdc_pair_groups,
         opaque_groups=opaque_groups,
         leaking_groups=sorted(leaking, key=lambda f: f.group_id),
     )

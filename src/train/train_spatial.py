@@ -131,17 +131,28 @@ def run_epoch(model, loader, device, criterion, optimizer=None, scaler=None, gra
             if is_train:
                 optimizer.zero_grad(set_to_none=True)
 
-            with autocast(device_type=device.type, enabled=(device.type == "cuda")):
+            with autocast(device_type=device.type, enabled=False):
                 logits = model(imgs)
                 loss = criterion(logits, labels)
 
             if is_train:
+                if not torch.isfinite(loss):
+                    print(f"WARNING: non-finite loss ({loss.item()}) -- skipping this batch")
+                    optimizer.zero_grad(set_to_none=True)
+                    scaler.update()
+                    continue
                 scaler.scale(loss).backward()
+                skip_step = False
                 if grad_clip_norm:
                     scaler.unscale_(optimizer)
-                    torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=grad_clip_norm)
-                scaler.step(optimizer)
+                    grad_norm = torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=grad_clip_norm)
+                    if not torch.isfinite(grad_norm):
+                        print(f"WARNING: non-finite grad norm ({grad_norm.item()}) -- skipping optimizer step this batch")
+                        skip_step = True
+                if not skip_step:
+                    scaler.step(optimizer)
                 scaler.update()
+                optimizer.zero_grad(set_to_none=True)
 
             running_loss += loss.item() * imgs.size(0)
             all_preds.append(torch.sigmoid(logits).detach())
